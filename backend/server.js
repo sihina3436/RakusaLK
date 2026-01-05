@@ -24,6 +24,7 @@ app.use("/api/users", require("./routes/user.routes"));
 app.use("/api/products", require("./routes/product.routes"));
 app.use("/api/categories", require("./routes/category.routes"));
 app.use("/api/orders", require("./routes/order.routes"));
+app.use("/api/colors", require("./routes/colors.routes"));
 
 app.get("/", (req, res) => {
   res.send("RakusaLK Backend Running 😈");
