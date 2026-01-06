@@ -8,6 +8,7 @@ import Shop from "../pages/shop/Shop";
 import SignUp from "../components/SignUp";
 import Login from "../components/Login";
 import ForgotPassword from "../components/ForgotPassword";
+import SizeGuide from "../components/SizeGuide";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
   {
     path: "/faq",
     element: <FAQ/>
+  },
+    {
+    path: "/size-guide",
+    element: <SizeGuide/>
   },
 ]);
 

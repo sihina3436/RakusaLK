@@ -40,9 +40,9 @@ const Footer = () => {
               Customer Service
             </h4>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li className="hover:text-yellow-400 cursor-pointer">Contact Us</li>
-              <li className="hover:text-yellow-400 cursor-pointer">Shipping & Returns</li>
-              <li className="hover:text-yellow-400 cursor-pointer">Size Guide</li>
+              <li><Link to="/contact" className="hover:text-yellow-400 cursor-pointer">Contact Us</Link></li>
+              <li><Link to="/shipping" className="hover:text-yellow-400 cursor-pointer">Shipping & Returns</Link></li>
+              <li><Link to="/size-guide" className="hover:text-yellow-400 cursor-pointer">Size Guide</Link></li>
               <li><Link to="/faq" className="hover:text-yellow-400 cursor-pointer">FAQ</Link></li>
             </ul>
           </div>
