@@ -53,14 +53,14 @@ const Navbar = () => {
 
           {/* Right Icons */}
           <div className="flex items-center space-x-4 md:space-x-6">
-            <button
+            <NavLink to = "/search"
               className="hidden md:flex items-center justify-center p-2 rounded-full
               text-gray-300 hover:text-yellow-400 hover:bg-white/10
               transition-all duration-300"
               aria-label="Search"
             >
               <Search size={20} />
-            </button>
+            </NavLink>
 
             <NavLink
               to="/login"
