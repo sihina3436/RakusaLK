@@ -1,11 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const { getAdminDashboardStats,getUserStats } = require("../controller/stats.controller");
+const {
+  getUserStats,
+  getAdminStats,
+} = require("../controller/stats.controller");
+
 const authMiddleware = require("../middleware/auth.middleware");
 const roleMiddleware = require("../middleware/role.middleware");
 
-router.get("/admin/dashboard", authMiddleware, roleMiddleware("seller"), getAdminDashboardStats);
-router.get("/user/dashboard", authMiddleware, roleMiddleware("user"), getUserStats);
+// User dashboard stats
+router.get("/user", authMiddleware, roleMiddleware("user"), getUserStats);
+// Admin dashboard stats
+router.get("/admin", authMiddleware, roleMiddleware("seller"), getAdminStats);
 
 module.exports = router;
-
