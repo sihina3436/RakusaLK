@@ -9,7 +9,7 @@ const productSchema = new mongoose.Schema(
     images: { type: [String], default: [] },
 
     sizes: [String],
-    colors: [String],
+    colors: [{ type: mongoose.Schema.Types.ObjectId, ref: "Color" }],
 
     countInStock: { type: Number, required: true },
 

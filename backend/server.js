@@ -9,9 +9,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors({ origin: true, credentials: true }));
+
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
 // MongoDB
 mongoose
@@ -24,6 +26,8 @@ app.use("/api/users", require("./routes/user.routes"));
 app.use("/api/products", require("./routes/product.routes"));
 app.use("/api/categories", require("./routes/category.routes"));
 app.use("/api/orders", require("./routes/order.routes"));
+app.use("/api/colors", require("./routes/colors.routes"));
+app.use("/api/stats", require("./routes/stats.routes"));
 
 app.get("/", (req, res) => {
   res.send("RakusaLK Backend Running 😈");

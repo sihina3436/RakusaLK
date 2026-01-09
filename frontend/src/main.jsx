@@ -7,6 +7,7 @@ import {store} from "./redux/store";
 import router from "./Routers/Router";
 import "remixicon/fonts/remixicon.css";
 import "./index.css";
+import "./utils/chartjs";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
