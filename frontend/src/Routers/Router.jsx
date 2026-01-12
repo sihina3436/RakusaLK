@@ -14,11 +14,10 @@ import Privacy from "../components/Privacy";
 import Terms from "../components/Terms";
 import Search from "../components/Search";
 import Cart from "../pages/Cart";
-import Login from "../components/Login";
-import Register from "../components/Register";
 
 import DashBoardLayout from "../pages/dashboard/DashBoardLayout";
 import AdminDashboard from "../pages/dashboard/admin/dashboard/AdminDashboard";
+import ProductDetail from "../pages/shop/product/ProductDetail";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +37,7 @@ const router = createBrowserRouter([
       { path: "contact", element: <Contact /> },
       { path: "about", element: <About /> },
       { path: "shop", element: <Shop /> },
+      { path:"/product/:id", element:<ProductDetail />}
     ],
   },
 
