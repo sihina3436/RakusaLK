@@ -16,18 +16,18 @@ const Cart = () => {
     if (newQuantity < 1) return;
     setCartItems(prev =>
       prev.map(item =>
-        item.id === productId ? { ...item, quantity: newQuantity } : item
+        item._id === productId ? { ...item, quantity: newQuantity } : item
       )
     );
   };
 
   const removeItem = (productId) => {
-    setCartItems(prev => prev.filter(item => item.id !== productId));
+    setCartItems(prev => prev.filter(item => item._id !== productId));
     toast.success("Item removed from cart");
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal >= 500 ? 0 : 15;
+  const shipping = subtotal >= 50000 ? 0 : 300;
   const total = subtotal + shipping;
 
   const applyPromo = () => {
@@ -78,15 +78,15 @@ const Cart = () => {
         <div className="lg:col-span-2 space-y-6">
           {cartItems.map((item, index) => (
             <motion.div
-              key={`${item.id}-${item.selectedSize}-${item.selectedColor}`}
+              key={`${item._id}-${item.selectedSize}-${item.selectedColor}`}
               className="flex gap-4 p-4 rounded-xl bg-black/70 border border-yellow-500/30 shadow-lg"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <Link to={`/product/${item.id}`} className="shrink-0">
+              <Link to={`/product/${item._id}`} className="shrink-0">
                 <img
-                  src={item.image}
+                  src={item.images[0]}
                   alt={item.name}
                   className="w-20 h-28 md:w-24 md:h-32 object-cover rounded-lg"
                 />
@@ -94,11 +94,11 @@ const Cart = () => {
 
               <div className="flex-1 flex flex-col justify-between">
                 <div className="flex justify-between items-start mb-2">
-                  <Link to={`/product/${item.id}`}>
+                  <Link to={`/product/${item._id}`}>
                     <h3 className="font-medium hover:text-yellow-400 transition">{item.name}</h3>
                   </Link>
                   <button
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => removeItem(item._id)}
                     className="hover:text-red-600 transition"
                   >
                     <Trash2 size={18} />
@@ -113,20 +113,20 @@ const Cart = () => {
                 <div className="mt-4 flex items-center justify-between">
                   <div className="flex items-center border border-yellow-500 rounded-lg overflow-hidden">
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => updateQuantity(item._id, item.quantity - 1)}
                       className="w-8 h-8 flex items-center justify-center hover:bg-yellow-500/20 transition"
                     >
                       <Minus size={14} />
                     </button>
                     <span className="w-10 text-center">{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => updateQuantity(item._id, item.quantity + 1)}
                       className="w-8 h-8 flex items-center justify-center hover:bg-yellow-500/20 transition"
                     >
                       <Plus size={14} />
                     </button>
                   </div>
-                  <span className="font-semibold">${item.price * item.quantity}</span>
+                  <span className="font-semibold">RS.{item.price * item.quantity}</span>
                 </div>
               </div>
             </motion.div>
@@ -165,27 +165,23 @@ const Cart = () => {
             <div className="border-t border-yellow-500/30 pt-4 space-y-2">
               <div className="flex justify-between text-sm text-white">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>RS.{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm text-white">
                 <span>Shipping</span>
-                <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                <span>{shipping === 0 ? "Free" : `RS.${shipping.toFixed(2)}`}</span>
               </div>
               {shipping > 0 && <p className="text-xs text-yellow-400">Free shipping on orders over RS.50000</p>}
             </div>
 
             <div className="border-t border-yellow-500/30 mt-4 pt-4 flex justify-between font-semibold text-lg text-white">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>RS.{total.toFixed(2)}</span>
             </div>
 
             <button className="w-full mt-4 py-3 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-400 transition flex items-center justify-center gap-2">
               Proceed to Checkout <ArrowRight size={18} />
             </button>
-
-            <p className="text-xs text-yellow-300 text-center mt-2">
-              Taxes and duties calculated at checkout
-            </p>
           </motion.div>
         </div>
       </div>

@@ -6,15 +6,18 @@ const ProductCard = ({ product, index = 0 }) => {
   if (!product) return null;
 
   const {
-    id,
+    _id,
     name,
-    image,
     price,
-    originalPrice,
+    images = [],
     category,
     isNew,
     isSale,
   } = product;
+
+  const image = images?.[0] || "";
+  const categoryName =
+    typeof category === "object" ? category.name : category;
 
   return (
     <motion.div
@@ -28,7 +31,7 @@ const ProductCard = ({ product, index = 0 }) => {
       className="group"
     >
       <Link
-        to={`/product/${id}`}
+        to={`/product/${_id}`}
         className="block rounded-xl overflow-hidden bg-black/70 backdrop-blur-lg
                    border border-yellow-500/20 hover:border-yellow-500/50
                    transition-all duration-400
@@ -94,7 +97,7 @@ const ProductCard = ({ product, index = 0 }) => {
         <div className="p-3 text-center">
           <p className="text-[9px] uppercase tracking-[0.15em]
                         text-yellow-500/70 mb-1">
-            {category}
+            {categoryName}
           </p>
 
           <h3 className="text-sm font-semibold text-white mb-2 tracking-wide truncate">
@@ -103,14 +106,9 @@ const ProductCard = ({ product, index = 0 }) => {
 
           <div className="flex items-center justify-center gap-2">
             <span className="text-yellow-500 text-sm font-semibold">
-              ${price}
+              Rs. {price}
             </span>
 
-            {originalPrice && (
-              <span className="text-gray-400 line-through text-xs">
-                ${originalPrice}
-              </span>
-            )}
           </div>
         </div>
       </Link>
