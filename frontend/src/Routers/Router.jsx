@@ -18,6 +18,9 @@ import Cart from "../pages/Cart";
 import DashBoardLayout from "../pages/dashboard/DashBoardLayout";
 import AdminDashboard from "../pages/dashboard/admin/dashboard/AdminDashboard";
 import ProductDetail from "../pages/shop/product/ProductDetail";
+import AddSize from "../pages/dashboard/admin/addSize/AddSize";
+import AddCategoryAndSubcategory from "../pages/dashboard/admin/addCategory/AddCategoryAndSubcategory";
+import ManageColors from "../pages/dashboard/admin/colors/manageColors";
 
 const router = createBrowserRouter([
   {
@@ -63,9 +66,9 @@ const router = createBrowserRouter([
       { path: "manage-products", element: <div>Manage Products Page</div> },
       { path: "users", element: <div>Users Page</div> },
       { path: "manage-orders", element: <div>Manage Orders Page</div> },
-      { path: "chat-inbox", element: <div>Chat Inbox Page</div> },
-      { path: "view-contacts", element: <div>Contacts Page</div> },
-      { path: "colors", element: <div>Colors Page</div> },
+      { path: "add-size", element: <AddSize /> },
+      { path: "add-categories", element: <AddCategoryAndSubcategory /> },
+      { path: "add-colors", element: <ManageColors /> },
     ],
   },
   {
