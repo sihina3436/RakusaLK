@@ -27,10 +27,10 @@ const Footer = () => {
               Quick Links
             </h4>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><Link to="/shop" className="hover:text-white">Shop All</Link></li>
-              <li><Link to="/shop" className="hover:text-white">New Arrivals</Link></li>
-              <li><Link to="/shop" className="hover:text-white">Best Sellers</Link></li>
-              <li><Link to="/shop" className="hover:text-white">Sale</Link></li>
+              <li><Link to="/shop" className="hover:text-yellow-400">Shop All</Link></li>
+              <li><Link to="/shop" className="hover:text-yellow-400">New Arrivals</Link></li>
+              <li><Link to="/shop" className="hover:text-yellow-400">Best Sellers</Link></li>
+              <li><Link to="/shop" className="hover:text-yellow-400">Sale</Link></li>
             </ul>
           </div>
 
@@ -40,10 +40,10 @@ const Footer = () => {
               Customer Service
             </h4>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li className="hover:text-white cursor-pointer">Contact Us</li>
-              <li className="hover:text-white cursor-pointer">Shipping & Returns</li>
-              <li className="hover:text-white cursor-pointer">Size Guide</li>
-              <li className="hover:text-white cursor-pointer">FAQ</li>
+              <li><Link to="/contact" className="hover:text-yellow-400 cursor-pointer">Contact Us</Link></li>
+              <li><Link to="/shipping" className="hover:text-yellow-400 cursor-pointer">Shipping & Returns</Link></li>
+              <li><Link to="/size-guide" className="hover:text-yellow-400 cursor-pointer">Size Guide</Link></li>
+              <li><Link to="/faq" className="hover:text-yellow-400 cursor-pointer">FAQ</Link></li>
             </ul>
           </div>
 
@@ -59,11 +59,11 @@ const Footer = () => {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-2 text-black text-sm bg-gray-300 placeholder-gray-500 rounded-l focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="flex-1 px-4 py-2 text-black text-sm bg-neutral-700 placeholder-yellow-500 rounded-l focus:outline-none focus:ring-2 focus:ring-gray-400"
               />
               <button
                 type="submit"
-                className="bg-white text-black px-5 py-2 text-sm uppercase hover:bg-gray-400 hover:text-white rounded-r transition"
+                className="bg-neutral-800 text-yellow-500 px-5 py-2 text-sm uppercase hover:bg-yellow-500 hover:text-black rounded-r transition"
               >
                 Join
               </button>
@@ -76,8 +76,8 @@ const Footer = () => {
         <div className="border-t border-gray-700 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
           <p>© {new Date().getFullYear()} Rakuza. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
-            <span className="hover:text-white cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-white cursor-pointer">Terms of Service</span>
+            <span className="hover:text-yellow-400 cursor-pointer"><Link to="/privacy">Privacy Policy</Link></span>
+            <span className="hover:text-yellow-400 cursor-pointer"><Link to="/terms">Terms of Service</Link></span>
           </div>
         </div>
 

@@ -10,6 +10,7 @@ const productSchema = new mongoose.Schema(
 
     sizes: [String],
     colors: [{ type: mongoose.Schema.Types.ObjectId, ref: "Color" }],
+    sizesAvailable: [{ type: mongoose.Schema.Types.ObjectId, ref: "Size" }],
 
     countInStock: { type: Number, required: true },
 

@@ -19,8 +19,9 @@ const navItems = [
   { path: "/dashboard/manage-products", label: "Products", icon: <FaBoxOpen /> },
   { path: "/dashboard/users", label: "Users", icon: <FaUsers /> },
   { path: "/dashboard/manage-orders", label: "Orders", icon: <FaShoppingCart /> },
-  { path: "/dashboard/chat-inbox", label: "Inbox", icon: <FaInbox /> },
-  { path: "/dashboard/view-contacts", label: "Contacts", icon: <FaAddressBook /> },
+  { path: "/dashboard/add-size", label: "Sizes", icon: <FaInbox /> },
+  { path: "/dashboard/add-categories", label: "Categories", icon: <FaAddressBook /> },
+  { path: "/dashboard/add-colors", label: "Colors", icon:<FaAddressBook /> },
 ];
 
 const AdminDashboardMain = () => {
