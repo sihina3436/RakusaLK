@@ -1,5 +1,6 @@
 const User = require("../model/user.model");
 const generateToken = require("../middleware/generateToken");
+const nodemailer = require("nodemailer");
 
 // ✅ Register
 const register = async (req, res) => {
@@ -139,6 +140,71 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+// ----------------------- FORGOT PASSWORD - SEND OTP -----------------------
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 min
+
+    user.resetOTP = otp;
+    user.resetOTPExpires = expiry;
+    await user.save();
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Password Reset OTP",
+      text: `Your OTP is ${otp}. It will expire in 10 minutes.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "OTP sent to your email." });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).json({ message: "Failed to send OTP" });
+  }
+};
+
+// ----------------------- RESET PASSWORD - VERIFY OTP -----------------------
+const resetPassword = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  try {
+    const user = await User.findOne({ email });
+
+    if (
+      !user ||
+      user.resetOTP !== otp ||
+      !user.resetOTPExpires ||
+      user.resetOTPExpires < Date.now()
+    ) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    //const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = newPassword;
+    user.resetOTP = undefined;
+    user.resetOTPExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ message: "Failed to reset password" });
+  }
+};
+
 module.exports = {
   register,
   signin,
@@ -146,4 +212,6 @@ module.exports = {
   deleteUser,
   getAllUsers,
   updateUserProfile,
+  forgotPassword,
+  resetPassword,
 };
