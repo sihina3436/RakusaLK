@@ -25,4 +25,17 @@ const getAllColors = async (req, res) => {
     }
 };
 
-module.exports = { createColor, getAllColors };
+const getColorById = async (req, res) => {
+    try {
+        const color = await Color.findById(req.params.id);
+        if (!color) {
+            return res.status(404).json({ message: "Color not found" });
+        }
+        res.status(200).json(color);
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports = { createColor, getAllColors, getColorById };
