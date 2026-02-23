@@ -65,6 +65,7 @@ const signin = async (req, res) => {
         email: user.email,
         role: user.role,
         address: user.address,
+        token: token,
       },
     });
   } catch (error) {
