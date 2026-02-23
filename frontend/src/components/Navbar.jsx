@@ -43,7 +43,11 @@ const Navbar = () => {
                    text-gray-300 hover:text-yellow-400
                    after:content-[''] after:absolute after:-bottom-1 after:left-0
                    after:h-0.5 after:bg-yellow-400 after:transition-all after:duration-300
-                   ${isActive ? "text-yellow-400 after:w-full" : "after:w-0 hover:after:w-full"}`
+                   ${
+                     isActive
+                       ? "text-yellow-400 after:w-full"
+                       : "after:w-0 hover:after:w-full"
+                   }`
                 }
               >
                 {item.name}
@@ -53,30 +57,53 @@ const Navbar = () => {
 
           {/* Right Icons */}
           <div className="flex items-center space-x-4 md:space-x-6">
-            <NavLink to = "/search"
-              className="hidden md:flex items-center justify-center p-2 rounded-full
-              text-gray-300 hover:text-yellow-400 hover:bg-white/10
-              transition-all duration-300"
+
+            {/* Search */}
+            <NavLink
+              to="/search"
+              className={({ isActive }) =>
+                `hidden md:flex items-center justify-center p-2 rounded-full
+                transition-all duration-300
+                ${
+                  isActive
+                    ? "text-yellow-400 bg-white/10"
+                    : "text-gray-300 hover:text-yellow-400 hover:bg-white/10"
+                }`
+              }
               aria-label="Search"
             >
               <Search size={20} />
             </NavLink>
 
+            {/* Account */}
             <NavLink
               to="/login"
-              className="flex items-center justify-center p-2 rounded-full
-              text-gray-300 hover:text-yellow-400 hover:bg-white/10
-              transition-all duration-300"
+              className={({ isActive }) =>
+                `flex items-center justify-center p-2 rounded-full
+                transition-all duration-300
+                ${
+                  isActive
+                    ? "text-yellow-400 bg-white/10"
+                    : "text-gray-300 hover:text-yellow-400 hover:bg-white/10"
+                }`
+              }
               aria-label="Account"
             >
               <User size={20} />
             </NavLink>
 
+            {/* Cart */}
             <NavLink
               to="/cart"
-              className="flex items-center justify-center p-2 rounded-full
-              text-gray-300 hover:text-yellow-400 hover:bg-white/10
-              relative transition-all duration-300"
+              className={({ isActive }) =>
+                `flex items-center justify-center p-2 rounded-full relative
+                transition-all duration-300
+                ${
+                  isActive
+                    ? "text-yellow-400 bg-white/10"
+                    : "text-gray-300 hover:text-yellow-400 hover:bg-white/10"
+                }`
+              }
               aria-label="Cart"
             >
               <ShoppingBag size={20} />
@@ -119,22 +146,17 @@ const Navbar = () => {
                   to={item.href}
                   className={({ isActive }) =>
                     `block text-lg tracking-widest uppercase py-2 transition
-                     ${isActive ? "text-yellow-400 font-semibold" : "text-gray-300 hover:text-yellow-400"}`
+                     ${
+                       isActive
+                         ? "text-yellow-400 font-semibold"
+                         : "text-gray-300 hover:text-yellow-400"
+                     }`
                   }
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
                 </NavLink>
               ))}
-
-              <div className="pt-4 border-t border-white/10">
-                <button
-                  className="flex items-center space-x-3 py-2 text-gray-300 hover:text-yellow-400 transition"
-                >
-                  <Search size={20} />
-                  <span className="text-sm uppercase tracking-wider">Search</span>
-                </button>
-              </div>
             </div>
           </motion.div>
         )}
