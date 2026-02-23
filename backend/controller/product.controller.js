@@ -6,45 +6,53 @@ const SubCategory = require("../model/subCategory.model");
 const createProduct = async (req, res) => {
   try {
     if (req.user.role !== "seller") {
-      return res.status(403).json({ message: "Only sellers can add products" });
+      return res.status(403).json({
+        message: "Only sellers can add products",
+      });
     }
 
     const {
       name,
       description,
       price,
-      images,
-      sizes,
+      sizesAvailable,
       colors,
       countInStock,
       category,
       subCategory,
+      images
     } = req.body;
 
-    // Validate category
-    const categoryExists = await Category.findById(category);
-    if (!categoryExists) {
-      return res.status(400).json({ message: "Invalid category" });
+    if (!name || !price || !countInStock || !category || !subCategory) {
+      return res.status(400).json({
+        message: "Required fields are missing",
+      });
     }
 
-    // Validate subcategory belongs to category
+    const categoryExists = await Category.findById(category);
+    if (!categoryExists) {
+      return res.status(400).json({
+        message: "Invalid category ID",
+      });
+    }
+
     const subCategoryExists = await SubCategory.findOne({
       _id: subCategory,
       category: category,
     });
 
     if (!subCategoryExists) {
-      return res
-        .status(400)
-        .json({ message: "SubCategory does not belong to this category" });
+      return res.status(400).json({
+        message: "SubCategory does not belong to selected category",
+      });
     }
 
-    const product = await Product.create({
+    const newProduct = new Product({
       name,
       description,
       price,
-      images,
-      sizes,
+      images: images || [],
+      sizesAvailable,
       colors,
       countInStock,
       category,
@@ -52,11 +60,17 @@ const createProduct = async (req, res) => {
       user: req.user._id,
     });
 
-    res.status(201).json(product);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+    const savedProduct = await newProduct.save();
+
+    res.status(201).json(savedProduct);
+  } catch (error) {
+    console.error("Create Product Error:", error);
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
+
 
 /**
  * GET ALL PRODUCTS
