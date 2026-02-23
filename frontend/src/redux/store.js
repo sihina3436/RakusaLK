@@ -8,10 +8,12 @@ import  {colorApi}  from "./color/colorApi";
 import  {productApi}  from "./products/productApi";
 import  {categoryApi } from "./category/categoryAPI";
 import  {orderApi } from "./order/orderApi";
+import cartReducer from "./cart/cartSlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    cart: cartReducer,
 
     [authAPI.reducerPath]: authAPI.reducer,
     [StatsApi.reducerPath]: StatsApi.reducer,

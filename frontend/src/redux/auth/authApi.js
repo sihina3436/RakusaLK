@@ -45,6 +45,13 @@ const authAPI = createApi({
       }),
       invalidatesTags: ["Auth"],
     }),
+      deleteUser: builder.mutation({
+        query: (id) => ({
+          url: `/${id}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: ["Auth"],
+      }),
   }),
 });
 
@@ -54,6 +61,7 @@ export const {
   useLogoutMutation,
   useGetAllUsersQuery,
   useUpdateUserProfileMutation,
+  useDeleteUserMutation,
 } = authAPI;
 
 export default authAPI;

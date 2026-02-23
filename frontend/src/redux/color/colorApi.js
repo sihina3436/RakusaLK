@@ -22,10 +22,15 @@ export const colorApi = createApi({
       query: () => "/",
       providesTags: ["Color"],
     }),
+    getColorById: builder.query({
+      query: (id) => `/${id}`,
+      providesTags: ["Color"],
+    }),
   }),
 });
 
 export const {
   useCreateColorMutation,
   useGetAllColorsQuery,
+  useGetColorByIdQuery
 } = colorApi;

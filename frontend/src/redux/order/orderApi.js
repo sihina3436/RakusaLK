@@ -11,7 +11,7 @@ export const orderApi = createApi({
   endpoints: (builder) => ({
     placeOrder: builder.mutation({
       query: (orderData) => ({
-        url: "/order/place",
+        url: "/place",
         method: "POST",
         body: orderData,
       }),
@@ -19,23 +19,23 @@ export const orderApi = createApi({
     }),
 
     getAllSellerOrders: builder.query({
-      query: () => "/order/getAllOrder",
+      query: () => "/getAllOrder",
       providesTags: ["Order"],
     }),
 
     getUserOrders: builder.query({
-      query: () => "/order/getUserOrders",
+      query: () => "/getUserOrders",
       providesTags: ["Order"],
     }),
 
     getOrderById: builder.query({
-      query: (id) => `/order/${id}`,
+      query: (id) => `/${id}`,
       providesTags: ["Order"],
     }),
 
     updateOrderStatus: builder.mutation({
       query: ({ id, status }) => ({
-        url: `/order/${id}/status`,
+        url: `/${id}/status`,
         method: "PUT",
         body: { status },
       }),
@@ -44,7 +44,7 @@ export const orderApi = createApi({
 
     deleteOrder: builder.mutation({
       query: (id) => ({
-        url: `/order/${id}`,
+        url: `/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Order"],

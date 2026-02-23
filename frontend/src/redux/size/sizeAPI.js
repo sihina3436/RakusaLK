@@ -23,10 +23,15 @@ export const sizeApi = createApi({
             query: () => '/sizes',
             providesTags: ['Size'],
         }),
+        getSizeById: builder.query({
+            query: (id) => `/sizes/${id}`,
+            providesTags: ['Size'],
+        }),
     }),
 });
 
 export const {
     useCreateSizeMutation,
     useGetAllSizesQuery,
+    useGetSizeByIdQuery
 } = sizeApi;
