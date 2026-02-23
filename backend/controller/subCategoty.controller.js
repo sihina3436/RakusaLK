@@ -6,16 +6,22 @@ const createSubCategory = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
+    const { name, category } = req.body;
+
+    if (!category) {
+      return res.status(400).json({ message: "Category ID is required" });
+    }
+
     const subCategory = await SubCategory.create({
-      name: req.body.name,
-      category: req.body.categoryId,
+      name,
+      category, 
       createdBy: req.user._id,
     });
 
     res.status(201).json(subCategory);
   } catch (err) {
-    res.status(400).json({ message: err.message });
     console.error(err);
+    res.status(400).json({ message: err.message });
   }
 };
 
