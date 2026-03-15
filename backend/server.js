@@ -30,6 +30,7 @@ app.use("/api/colors", require("./routes/colors.routes"));
 app.use("/api/stats", require("./routes/stats.routes"));
 app.use("/api/sizes", require("./routes/size.routes"));
 app.use("/api/upload", require("./routes/upload.routes"));
+app.use("/api/reviews", require("./routes/review.routes"));
 
 app.get("/", (req, res) => {
   res.send("RakusaLK Backend Running 😈");

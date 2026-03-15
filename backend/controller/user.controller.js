@@ -140,6 +140,36 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id, "username email role address createdAt");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Get User Error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+ const verifyToken = async (req, res) => {
+  try {
+    res.json({
+      valid: true,
+      user: {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   register,
   signin,
@@ -147,4 +177,7 @@ module.exports = {
   deleteUser,
   getAllUsers,
   updateUserProfile,
+  getUserById,
+  verifyToken
+
 };

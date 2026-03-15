@@ -9,7 +9,11 @@ const placeOrder = async (req, res) => {
 
   try {
     const userId = req.user._id; // from auth middleware
-    const { cartItems } = req.body;
+    const { cartItems, paySlip } = req.body;
+
+    if(!paySlip) {
+      throw new Error("PaySlip is required, can not place order without paySlip");
+    }
 
     // 1️⃣ Get user address
     const user = await User.findById(userId).session(session);
@@ -60,6 +64,7 @@ const placeOrder = async (req, res) => {
           shippingAddress: user.address,
           products: orderProducts,
           totalAmount,
+          paySlip,
         },
       ],
       { session }
@@ -102,14 +107,33 @@ const getOrderById = async (req, res) => {
     const order = await Order.findById(req.params.id)
       .populate("user", "username email")
       .populate("products.product", "name price");
+
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
+
+    
+    if (req.user.role === "user") {
+      if (order.user.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
+    
+    if (req.user.role === "seller") {
+      const isSellerProduct = order.products.some(
+        (item) => item.seller.toString() === req.user._id.toString()
+      );
+
+      if (!isSellerProduct) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
     res.json(order);
 
   } catch (err) {
     res.status(500).json({ message: err.message });
-
   }
 };
 
@@ -121,6 +145,11 @@ const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     } 
     order.status = req.body.status || order.status;
+
+    if (req.body.status === "cancelled") {
+      order.orderCancelled = true;
+    }
+    
     await order.save();
     res.json(order);
 
@@ -147,19 +176,36 @@ const getUserOrders = async (req, res) => {
 
 // delete order
 const deleteOrder = async (req, res) => {
-  try { 
-    const order = await Order.findByIdAndDelete(req.params.id);
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const order = await Order.findById(req.params.id).session(session);
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      throw new Error("Order not found");
     }
-    res.json({ message: "Order deleted successfully" });
+
+    //  Restore stock
+    for (const item of order.products) {
+      await Product.updateOne(
+        { _id: item.product },
+        { $inc: { countInStock: item.quantity } },
+        { session }
+      );
+    }
+
+    await Order.deleteOne({ _id: order._id }).session(session);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.json({ message: "Order deleted & stock restored" });
 
   } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
     res.status(500).json({ message: err.message });
-    console.log(err);
   }
-
-
 };
 
 
