@@ -1,3 +1,5 @@
+// src/redux/cart/cartSlice.js
+
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -26,7 +28,8 @@ const cartSlice = createSlice({
       const existing = state.products.find(
         (p) =>
           p._id === action.payload._id &&
-          p.size === action.payload.size
+          p.size === action.payload.size &&
+          p.color === action.payload.color   // ✅ FIXED
       );
 
       if (existing) {
@@ -42,10 +45,10 @@ const cartSlice = createSlice({
     },
 
     updateQuantity: (state, action) => {
-      const { id, size, type } = action.payload;
+      const { id, size, color, type } = action.payload;
 
       state.products.forEach((p) => {
-        if (p._id === id && p.size === size) {
+        if (p._id === id && p.size === size && p.color === color) {
           if (type === "inc") p.quantity += 1;
           if (type === "dec" && p.quantity > 1) p.quantity -= 1;
         }
@@ -55,10 +58,10 @@ const cartSlice = createSlice({
     },
 
     removeFromCart: (state, action) => {
-      const { id, size } = action.payload;
+      const { id, size, color } = action.payload;
 
       state.products = state.products.filter(
-        (p) => !(p._id === id && p.size === size)
+        (p) => !(p._id === id && p.size === size && p.color === color)
       );
 
       calculateTotals(state);
