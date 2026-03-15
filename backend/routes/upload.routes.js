@@ -26,4 +26,18 @@ router.post(
   }
 );
 
+router.post("/uploadPaySlip", upload.single("paySlip"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file provided" });
+    }
+
+    const url = await uploadBuffer(req.file.buffer);
+    res.status(200).json({ url });
+  } catch (err) {
+    console.error("PaySlip upload error:", err);
+    res.status(500).json({ error: "PaySlip upload failed" });
+  }
+});
+
 module.exports = router;
