@@ -14,83 +14,81 @@ import Privacy from "../components/Privacy";
 import Terms from "../components/Terms";
 import Search from "../components/Search";
 import Cart from "../pages/Cart";
-
 import DashBoardLayout from "../pages/dashboard/DashBoardLayout";
 import AdminDashboard from "../pages/dashboard/admin/dashboard/AdminDashboard";
 import ProductDetail from "../pages/shop/product/ProductDetail";
 import AddSize from "../pages/dashboard/admin/addSize/AddSize";
 import AddCategoryAndSubcategory from "../pages/dashboard/admin/addCategory/AddCategoryAndSubcategory";
 import ManageColors from "../pages/dashboard/admin/colors/manageColors";
+import OrdersManagement from "../pages/dashboard/admin/manageOrders/OrdersManagement";
+import AddProduct from "../pages/dashboard/admin/addProduct/AddProduct";
+import ManageProducts from "../pages/dashboard/admin/manageProduct/ManageProducts";
+import EditProduct from "../pages/dashboard/admin/manageProduct/EditProduct";
+import ManageUsers from "../pages/dashboard/admin/manageUsers/ManageUsers";
+import UserDashboard from "../pages/dashboard/user/dashboard/UserDashboard";
+import UserOrders from "../pages/dashboard/user/order/UserOrders";
+import ManageProfile from "../pages/dashboard/user/profile/ManageProfile";
+import UserDashboardMain from "../pages/dashboard/user/dashboard/UserDashboardMain";
+import PrivateRoute from "./PrivateRoutes";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-        {path: '/', element:<Home/>},  
-        {path: '/contact', element: <Contact/>},
-        {path: '/about', element: <About/>},
-        {path: '/shop', element: <Shop/>},
-        {path: '/signup', element: <SignUp/>},
-        {path: '/login', element: <Login/>},
-        {path: '/forgot-password', element: <ForgotPassword/>},
-        {path: '/search', element: <Search/>},
-        {path: '/cart', element: <Cart/>},
       { index: true, element: <Home /> },
       { path: "contact", element: <Contact /> },
       { path: "about", element: <About /> },
       { path: "shop", element: <Shop /> },
-      { path:"/product/:id", element:<ProductDetail />}
+      { path: "product/:id", element: <ProductDetail /> },
+      { path: "search", element: <Search /> },
+      { path: "cart", element: <Cart /> },
+      { path: "signup", element: <SignUp /> },
+      { path: "login", element: <Login /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
     ],
   },
-
-  /* ======================
-     AUTH ROUTES
-     ====================== */
-  { path: "/login", element: <Login /> },
-  { path: "/register", element: <DashBoardLayout /> },
 
   /* ======================
      DASHBOARD ROUTES
      ====================== */
   {
     path: "/dashboard",
-    element: <DashBoardLayout />,
+    element: <PrivateRoute role="seller"><DashBoardLayout /></PrivateRoute>,
     children: [
-      /* -------- USER -------- */
-      { path: "user/profile", element: <div>User Profile Page</div> },
-
-      /* -------- ADMIN -------- */
-      { path: "admin", element: <AdminDashboard /> },
-      { path: "add-product", element: <div>Add Product Page</div> },
-      { path: "manage-products", element: <div>Manage Products Page</div> },
-      { path: "users", element: <div>Users Page</div> },
-      { path: "manage-orders", element: <div>Manage Orders Page</div> },
-      { path: "add-size", element: <AddSize /> },
-      { path: "add-categories", element: <AddCategoryAndSubcategory /> },
-      { path: "add-colors", element: <ManageColors /> },
+      { path: "admin", element: <PrivateRoute role="seller"><AdminDashboard /></PrivateRoute> },
+      { path: "add-product", element: <PrivateRoute role="seller"><AddProduct /></PrivateRoute> },
+      { path: "manage-products", element: <PrivateRoute role="seller"><ManageProducts /></PrivateRoute> },
+      { path: "edit-product/:id", element: <PrivateRoute role="seller"><EditProduct /></PrivateRoute> },
+      { path: "users", element: <PrivateRoute role="seller"><ManageUsers /></PrivateRoute> },
+      { path: "manage-orders", element: <PrivateRoute role="seller"><OrdersManagement /></PrivateRoute> },
+      { path: "add-size", element: <PrivateRoute role="seller"><AddSize /></PrivateRoute> },
+      { path: "add-categories", element: <PrivateRoute role="seller"><AddCategoryAndSubcategory /></PrivateRoute> },
+      { path: "add-colors", element: <PrivateRoute role="seller"><ManageColors /></PrivateRoute> },
     ],
   },
+
+  /* ======================
+     USER DASHBOARD ROUTES
+     ====================== */
   {
-    path: "/faq",
-    element: <FAQ/>
+    path: "/dashboard/user",
+    element: <PrivateRoute role="user"><UserDashboardMain /></PrivateRoute>,
+    children: [
+      { path: "user", element: <PrivateRoute role="user"><UserDashboard /></PrivateRoute> },
+      { path: "orders", element: <PrivateRoute role="user"><UserOrders /></PrivateRoute> },
+      { path: "manage-profile", element: <PrivateRoute role="user"><ManageProfile /></PrivateRoute> },
+    ],
   },
-  {
-    path: "/size-guide",
-    element: <SizeGuide/>
-  },
-  {
-    path: "/shipping",
-    element: <Shipping/>
-  },
-  {
-    path: "/privacy",
-    element: <Privacy/>
-  },
-  {
-    path: "/terms",
-    element: <Terms/>
-  },
+
+  /* ======================
+     STATIC PAGES
+     ====================== */
+  { path: "/faq", element: <FAQ /> },
+  { path: "/size-guide", element: <SizeGuide /> },
+  { path: "/shipping", element: <Shipping /> },
+  { path: "/privacy", element: <Privacy /> },
+  { path: "/terms", element: <Terms /> },
 ]);
 
 export default router;
