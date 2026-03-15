@@ -41,12 +41,14 @@ const orderSchema = new mongoose.Schema(
     ],
 
     totalAmount: { type: Number, required: true },
+    paySlip: String, 
 
     status: {
       type: String,
       enum: ["pending", "processing", "shipped", "completed", "cancelled"],
       default: "pending",
     },
+    orderCancelled: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
