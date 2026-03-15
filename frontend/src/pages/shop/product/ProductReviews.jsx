@@ -1,19 +1,31 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {motion ,AnimatePresence } from "framer-motion";
 import { Star, ThumbsUp, X } from "lucide-react";
-import { reviews } from "../../../components/reviews.js";
 import { toast } from "sonner";
+import {
+  useCreateReviewMutation,
+  useGetReviewsByProductIdQuery,
+} from "../../../redux/review/reviewAPI";
 
-const ProductReviews = ({ productId }) => {
+
+
+const ProductReviews = ({ productId, user }) => {
   const [showForm, setShowForm] = useState(false);
+  
+
   const [newReview, setNewReview] = useState({
     rating: 5,
     title: "",
     comment: "",
-    name: "",
   });
 
-  const productReviews = reviews.filter((r) => r.productId === productId);
+  const {
+    data: productReviews = [],
+    isLoading,
+  } = useGetReviewsByProductIdQuery(productId);
+
+  const [createReview, { isLoading: isSubmitting }] =
+    useCreateReviewMutation();
 
   const averageRating =
     productReviews.length > 0
@@ -33,11 +45,35 @@ const ProductReviews = ({ productId }) => {
     };
   });
 
-  const handleSubmitReview = (e) => {
+  console.log("Fetched Reviews:", productReviews);
+
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
-    toast.success("Thank you for your review! Pending moderation.");
-    setShowForm(false);
-    setNewReview({ rating: 5, title: "", comment: "", name: "" });
+
+    if (!user) {
+      toast.error("You must be logged in to leave a review.");
+      return;
+    }
+
+    try {
+      await createReview({
+        productId,
+        userId: user._id,
+        rating: newReview.rating,
+        comment: newReview.comment,
+      }).unwrap();
+
+      toast.success("Review submitted successfully!");
+
+      setShowForm(false);
+      setNewReview({
+        rating: 5,
+        title: "",
+        comment: "",
+      });
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to submit review");
+    }
   };
 
   const renderStars = (rating, interactive = false, onRate) => (
@@ -66,16 +102,15 @@ const ProductReviews = ({ productId }) => {
     <>
       <section className="border-t border-yellow-500/20 py-14 bg-black">
         <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-2xl font-serif text-white mb-10">
-              Customer Reviews
-            </h2>
+          <h2 className="text-2xl font-serif text-white mb-10">
+            Customer Reviews
+          </h2>
 
+          {isLoading ? (
+            <p className="text-gray-400 text-center py-10">
+              Loading reviews...
+            </p>
+          ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
               {/* SUMMARY */}
               <div>
@@ -92,22 +127,24 @@ const ProductReviews = ({ productId }) => {
                 </div>
 
                 <div className="space-y-3 mb-6">
-                  {ratingDistribution.map(({ rating, percentage, count }) => (
-                    <div key={rating} className="flex items-center gap-3">
-                      <span className="text-sm w-10 text-gray-300">
-                        {rating}★
-                      </span>
-                      <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-yellow-500"
-                          style={{ width: `${percentage}%` }}
-                        />
+                  {ratingDistribution.map(
+                    ({ rating, percentage, count }) => (
+                      <div key={rating} className="flex items-center gap-3">
+                        <span className="text-sm w-10 text-gray-300">
+                          {rating}★
+                        </span>
+                        <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-yellow-500"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <span className="text-sm text-gray-400 w-6">
+                          {count}
+                        </span>
                       </div>
-                      <span className="text-sm text-gray-400 w-6">
-                        {count}
-                      </span>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
 
                 <button
@@ -124,40 +161,24 @@ const ProductReviews = ({ productId }) => {
               <div className="lg:col-span-2">
                 {productReviews.length > 0 ? (
                   <div className="space-y-8">
-                    {productReviews.map((review, index) => (
-                      <motion.div
-                        key={review.id}
-                        initial={{ opacity: 0, y: 15 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.08 }}
-                        viewport={{ once: true }}
+                    {productReviews.map((review) => (
+                      <div
+                        key={review._id}
                         className="border-b border-yellow-500/20 pb-6"
                       >
-                        <div className="flex justify-between mb-2">
-                          <div>
-                            {renderStars(review.rating)}
-                            <h4 className="text-white mt-1">
-                              {review.title}
-                            </h4>
-                          </div>
-                          <span className="text-xs text-gray-400">
-                            {new Date(review.date).toLocaleDateString()}
-                          </span>
-                        </div>
+                        {renderStars(review.rating)}
 
-                        <p className="text-gray-400 text-sm mb-3">
+                        <p className="text-gray-400 text-sm mt-3">
                           {review.comment}
                         </p>
 
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center mt-3">
                           <span className="text-xs text-gray-300">
-                            {review.userName}
+                            {review.userId?.username}
+
                           </span>
-                          <button className="flex items-center gap-1 text-xs text-gray-400 hover:text-yellow-500">
-                            <ThumbsUp size={12} /> Helpful
-                          </button>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 ) : (
@@ -167,7 +188,7 @@ const ProductReviews = ({ productId }) => {
                 )}
               </div>
             </div>
-          </motion.div>
+          )}
         </div>
       </section>
 
@@ -175,9 +196,6 @@ const ProductReviews = ({ productId }) => {
       <AnimatePresence>
         {showForm && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center
                        bg-black/70 backdrop-blur-sm px-4"
             onClick={() => setShowForm(false)}
@@ -185,53 +203,14 @@ const ProductReviews = ({ productId }) => {
             <motion.form
               onClick={(e) => e.stopPropagation()}
               onSubmit={handleSubmitReview}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
               className="bg-black border border-yellow-500/30
                          rounded-xl p-6 w-full max-w-md space-y-4"
             >
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg text-white">Write a Review</h3>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="text-gray-400 hover:text-yellow-500"
-                >
-                  <X size={18} />
-                </button>
-              </div>
+              <h3 className="text-lg text-white">Write a Review</h3>
 
-              <div>
-                <label className="text-sm text-gray-400 mb-2 block">
-                  Rating
-                </label>
-                {renderStars(newReview.rating, true, (r) =>
-                  setNewReview({ ...newReview, rating: r })
-                )}
-              </div>
-
-              <input
-                required
-                placeholder="Your Name"
-                className="w-full bg-black border border-yellow-500/30
-                           px-4 py-2.5 text-white outline-none text-sm"
-                value={newReview.name}
-                onChange={(e) =>
-                  setNewReview({ ...newReview, name: e.target.value })
-                }
-              />
-
-              <input
-                required
-                placeholder="Review Title"
-                className="w-full bg-black border border-yellow-500/30
-                           px-4 py-2.5 text-white outline-none text-sm"
-                value={newReview.title}
-                onChange={(e) =>
-                  setNewReview({ ...newReview, title: e.target.value })
-                }
-              />
+              {renderStars(newReview.rating, true, (r) =>
+                setNewReview({ ...newReview, rating: r })
+              )}
 
               <textarea
                 required
@@ -241,7 +220,10 @@ const ProductReviews = ({ productId }) => {
                            px-4 py-2.5 text-white outline-none resize-none text-sm"
                 value={newReview.comment}
                 onChange={(e) =>
-                  setNewReview({ ...newReview, comment: e.target.value })
+                  setNewReview({
+                    ...newReview,
+                    comment: e.target.value,
+                  })
                 }
               />
 
@@ -253,12 +235,14 @@ const ProductReviews = ({ productId }) => {
                 >
                   Cancel
                 </button>
+
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className="px-5 py-2 bg-yellow-500 text-black
                              font-semibold tracking-widest text-xs"
                 >
-                  Submit
+                  {isSubmitting ? "Submitting..." : "Submit"}
                 </button>
               </div>
             </motion.form>

@@ -1,30 +1,68 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { Grid, LayoutGrid, SlidersHorizontal, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { Grid, LayoutGrid } from "lucide-react";
 
 import ProductCard from "./ProductCard.jsx";
-import { products, categories } from "../../components/products.js";
+
+import { useGetAllProductsQuery } from "../../redux/products/productApi";
+import {
+  useGetAllCategoriesQuery,
+  useGetSubCategoryByCategoryQuery,
+} from "../../redux/category/categoryAPI";
 
 const Shop = () => {
+  /* ================================
+     RTK DATA
+  ================================= */
+  const { data: products = [], isLoading } = useGetAllProductsQuery();
+  const { data: categories = [] } = useGetAllCategoriesQuery();
 
+  /* ================================
+     URL SEARCH PARAMS
+  ================================= */
   const [searchParams, setSearchParams] = useSearchParams();
-  const [gridCols, setGridCols] = useState(4);
-  const [showFilters, setShowFilters] = useState(false);
-  const [showSort, setShowSort] = useState(false);
 
-  const selectedCategory = searchParams.get("category") || "all";
+  const selectedCategory =
+    searchParams.get("category") || "all";
+  const selectedSubCategory =
+    searchParams.get("subcategory") || "all";
   const sortBy = searchParams.get("sort") || "featured";
 
+  /* ================================
+     SUBCATEGORY QUERY (dynamic)
+  ================================= */
+  const { data: subCategories = [] } =
+    useGetSubCategoryByCategoryQuery(selectedCategory, {
+      skip: selectedCategory === "all",
+    });
+
+  /* ================================
+     UI STATES
+  ================================= */
+  const [gridCols, setGridCols] = useState(4);
+
+  /* ================================
+     FILTER + SORT LOGIC
+  ================================= */
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
+    // CATEGORY FILTER
     if (selectedCategory !== "all") {
       filtered = filtered.filter(
-        (p) => p.category.toLowerCase() === selectedCategory.toLowerCase()
+        (p) => p.category?._id === selectedCategory
       );
     }
 
+    // SUBCATEGORY FILTER
+    if (selectedSubCategory !== "all") {
+      filtered = filtered.filter(
+        (p) => p.subCategory?._id === selectedSubCategory
+      );
+    }
+
+    // SORTING
     switch (sortBy) {
       case "price-asc":
         filtered.sort((a, b) => a.price - b.price);
@@ -33,15 +71,25 @@ const Shop = () => {
         filtered.sort((a, b) => b.price - a.price);
         break;
       case "newest":
-        filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+        filtered.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
         break;
       default:
         break;
     }
 
     return filtered;
-  }, [selectedCategory, sortBy]);
+  }, [
+    products,
+    selectedCategory,
+    selectedSubCategory,
+    sortBy,
+  ]);
 
+  /* ================================
+     UPDATE URL PARAM
+  ================================= */
   const updateParam = (key, value) => {
     if (!value || value === "all") {
       searchParams.delete(key);
@@ -51,174 +99,57 @@ const Shop = () => {
     setSearchParams(searchParams);
   };
 
+  /* ================================
+     LOADING
+  ================================= */
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-yellow-400 flex items-center justify-center">
+        Loading Products...
+      </div>
+    );
+  }
+
+  /* ================================
+     UI
+  ================================= */
   return (
     <>
-      <section className="relative bg-black py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-b from-black via-black/80 to-black" />
-        <div className="relative max-w-5xl mx-auto text-center px-6">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="font-serif text-4xl md:text-6xl tracking-[0.3em] text-white mb-6"
-          >
-            SHOP
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-gray-400 max-w-xl mx-auto"
-          >
-            Discover refined luxury pieces designed for timeless elegance.
-          </motion.p>
-        </div>
+      {/* HERO */}
+      <section className="bg-black py-24 text-center">
+        <h1 className="text-5xl text-white tracking-widest">
+          SHOP
+        </h1>
       </section>
 
-      <section className="pb-16 bg-linear-to-b from-black via-neutral-800 to-black">
+      <section className="bg-black min-h-screen pb-20">
         <div className="max-w-7xl mx-auto px-6">
 
-          <div className="flex flex-wrap items-center justify-between gap-6 mb-12 border-b border-yellow-500/20 pb-6">
+          {/* FILTER BAR */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-10 border-b border-yellow-500/20 pb-6">
 
-            <div className="hidden lg:flex gap-8">
-              {categories.map((cat) => (
-                <button
-                  key={cat.slug}
-                  onClick={() => updateParam("category", cat.slug)}
-                  className={`uppercase text-sm tracking-widest transition-colors ${
-                    selectedCategory === cat.slug
-                      ? "text-yellow-500"
-                      : "text-gray-400 hover:text-yellow-500"
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setShowFilters(true)}
-              className="lg:hidden flex items-center gap-2 text-gray-300 uppercase tracking-widest text-sm"
-            >
-              <SlidersHorizontal size={16} />
-              Filters
-            </button>
-
-            <div className="flex items-center gap-4 relative">
-              <span className="text-sm text-gray-400">
-                {filteredProducts.length} Products
-              </span>
-
-              <div className="relative">
-                <button
-                  onClick={() => setShowSort(!showSort)}
-                  className="border border-yellow-500/30 px-4 py-2 text-sm text-gray-300 uppercase tracking-widest hover:border-yellow-500 transition"
-                >
-                  Sort
-                </button>
-
-                <AnimatePresence>
-                  {showSort && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-2 w-48 bg-black border border-yellow-500/30 z-50"
-                    >
-                      {[
-                        ["featured", "Featured"],
-                        ["newest", "Newest"],
-                        ["price-asc", "Price: Low to High"],
-                        ["price-desc", "Price: High to Low"],
-                      ].map(([value, label]) => (
-                        <button
-                          key={value}
-                          onClick={() => {
-                            updateParam("sort", value);
-                            setShowSort(false);
-                          }}
-                          className="block w-full text-left px-4 py-3 text-sm text-gray-400 hover:text-yellow-500 hover:bg-yellow-500/5"
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* GRID TOGGLE */}
-              <div className="hidden lg:flex gap-2">
-                <button
-                  onClick={() => setGridCols(5)}
-                  className={`p-2 ${
-                    gridCols === 5 ? "text-yellow-500" : "text-gray-400"
-                  }`}
-                >
-                  <Grid size={18} />
-                </button>
-                <button
-                  onClick={() => setGridCols(4)}
-                  className={`p-2 ${
-                    gridCols === 4 ? "text-yellow-500" : "text-gray-400"
-                  }`}
-                >
-                  <LayoutGrid size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* PRODUCTS */}
-          <motion.div
-            layout
-            className={`grid gap-8 ${
-              gridCols === 5
-                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5"
-                : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-            }`}
-          >
-            {filteredProducts.map((product, index) => (
-              <ProductCard key={product?.id || index} product={product} index={index} />
-            ))}
-          </motion.div>
-
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-20 text-gray-400">
-              No products found.
-            </div>
-          )}
-        </div>
-      </section>
-
-      <AnimatePresence>
-        {showFilters && (
-          <motion.div
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ duration: 0.4 }}
-            className="fixed inset-0 bg-black z-50 p-6"
-          >
-            <div className="flex items-center justify-between mb-10">
-              <h3 className="font-serif text-2xl text-yellow-500">Filters</h3>
-              <button onClick={() => setShowFilters(false)}>
-                <X className="text-gray-400" />
+            {/* CATEGORY */}
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => updateParam("category", "all")}
+                className={`px-3 py-1 rounded ${
+                  selectedCategory === "all"
+                    ? "bg-yellow-500 text-black"
+                    : "text-gray-400"
+                }`}
+              >
+                All
               </button>
-            </div>
 
-            <div className="space-y-4">
               {categories.map((cat) => (
                 <button
-                  key={cat.slug}
-                  onClick={() => {
-                    updateParam("category", cat.slug);
-                    setShowFilters(false);
-                  }}
-                  className={`block w-full text-left uppercase tracking-widest text-sm py-2 ${
-                    selectedCategory === cat.slug
-                      ? "text-yellow-500"
+                  key={cat._id}
+                  onClick={() =>
+                    updateParam("category", cat._id)
+                  }
+                  className={`px-3 py-1 rounded ${
+                    selectedCategory === cat._id
+                      ? "bg-yellow-500 text-black"
                       : "text-gray-400"
                   }`}
                 >
@@ -226,9 +157,91 @@ const Shop = () => {
                 </button>
               ))}
             </div>
+
+            {/* SUB CATEGORY */}
+            {selectedCategory !== "all" && (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() =>
+                    updateParam("subcategory", "all")
+                  }
+                  className={`px-3 py-1 text-sm rounded ${
+                    selectedSubCategory === "all"
+                      ? "bg-yellow-500 text-black"
+                      : "text-zinc-400"
+                  }`}
+                >
+                  All Sub
+                </button>
+
+                {subCategories.map((sub) => (
+                  <button
+                    key={sub._id}
+                    onClick={() =>
+                      updateParam("subcategory", sub._id)
+                    }
+                    className={`px-3 py-1 text-sm rounded ${
+                      selectedSubCategory === sub._id
+                        ? "bg-yellow-500 text-black"
+                        : "text-zinc-400"
+                    }`}
+                  >
+                    {sub.name}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* SORT */}
+            <select
+              value={sortBy}
+              onChange={(e) =>
+                updateParam("sort", e.target.value)
+              }
+              className="bg-zinc-900 border border-yellow-500/30 px-3 py-2 rounded text-yellow-400 text-sm"
+            >
+              <option value="featured">Featured</option>
+              <option value="newest">Newest</option>
+              <option value="price-asc">Price Low → High</option>
+              <option value="price-desc">Price High → Low</option>
+            </select>
+
+            {/* GRID TOGGLE */}
+            <div className="flex gap-3">
+              <button onClick={() => setGridCols(5)}>
+                <Grid className="text-yellow-500" />
+              </button>
+              <button onClick={() => setGridCols(4)}>
+                <LayoutGrid className="text-yellow-500" />
+              </button>
+            </div>
+          </div>
+
+          {/* PRODUCTS GRID */}
+          <motion.div
+            layout
+            className={`grid gap-6 ${
+              gridCols === 5
+                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5"
+                : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+            }`}
+          >
+            {filteredProducts.map((product, i) => (
+              <ProductCard
+                key={product._id}
+                product={product}
+                index={i}
+              />
+            ))}
           </motion.div>
-        )}
-      </AnimatePresence>
+
+          {filteredProducts.length === 0 && (
+            <p className="text-center text-gray-400 py-20">
+              No products found
+            </p>
+          )}
+        </div>
+      </section>
     </>
   );
 };
