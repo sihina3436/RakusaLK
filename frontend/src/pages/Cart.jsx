@@ -1,198 +1,275 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
-import { products } from "../components/products.js";
+import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
+import {
+  usePlaceOrderMutation,
+  useUplpadPaySlipMutation,
+} from "../redux/order/orderApi";
+import {
+  clearCart,
+  updateQuantity,
+  removeFromCart,
+} from "../redux/cart/cartSlice";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    { ...products[0], quantity: 1, selectedSize: "M", selectedColor: "Charcoal" },
-    { ...products[1], quantity: 2, selectedSize: "S", selectedColor: "Black" },
-  ]);
-  const [promoCode, setPromoCode] = useState("");
+  const dispatch = useDispatch();
+  const { products, totalPrice } = useSelector((state) => state.cart);
 
-  const updateQuantity = (productId, newQuantity) => {
-    if (newQuantity < 1) return;
-    setCartItems(prev =>
-      prev.map(item =>
-        item._id === productId ? { ...item, quantity: newQuantity } : item
-      )
-    );
+  const [placeOrder, { isLoading }] = usePlaceOrderMutation();
+  const [uploadPaySlip] = useUplpadPaySlipMutation();
+
+  const [paySlip, setPaySlip] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > MAX_SIZE) {
+      toast.error("File must be under 5MB");
+      return;
+    }
+
+    setPaySlip(file);
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
-  const removeItem = (productId) => {
-    setCartItems(prev => prev.filter(item => item._id !== productId));
-    toast.success("Item removed from cart");
+  const removeImage = () => {
+    setPaySlip(null);
+    setPreviewUrl(null);
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal >= 50000 ? 0 : 300;
-  const total = subtotal + shipping;
+  const handlePlaceOrder = async () => {
+    if (products.length === 0) {
+      return toast.error("Cart is empty");
+    }
 
-  const applyPromo = () => {
-    if (promoCode.toLowerCase() === "welcome10") {
-      toast.success("Promo code applied! 10% discount");
-    } else {
-      toast.error("Invalid promo code");
+    if (!paySlip) {
+      return toast.error("Please upload payment slip");
+    }
+
+    try {
+      // 🔹 Step 1: Upload PaySlip to Cloudinary
+      const formData = new FormData();
+      formData.append("paySlip", paySlip);
+
+      const uploadResponse = await uploadPaySlip(formData).unwrap();
+      const paySlipUrl = uploadResponse.url;
+
+      // 🔹 Step 2: Place Order using URL
+      await placeOrder({
+        cartItems: products.map((item) => ({
+          productId: item._id,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+        })),
+        paySlip: paySlipUrl,
+      }).unwrap();
+
+      toast.success("Order placed successfully 🎉");
+
+      dispatch(clearCart());
+      setPaySlip(null);
+      setPreviewUrl(null);
+    } catch (err) {
+      toast.error(err?.data?.message || "Order failed");
+      console.log(err);
     }
   };
 
-  if (cartItems.length === 0) {
-    return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-black px-4">
-        <ShoppingBag className="w-16 h-16 text-white mb-6" />
-        <h1 className="text-3xl font-serif text-white mb-2">Your Cart is Empty</h1>
-        <p className="text-white mb-6 text-center max-w-xs">
-          Looks like you haven't added any items to your cart yet.
-        </p>
-        <Link
-          to="/shop"
-          className="px-6 py-3 bg-yellow-500 text-black font-semibold rounded-lg hover:bg-yellow-400 transition"
-        >
-          Start Shopping
-        </Link>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-black min-h-screen text-white px-4 py-12 md:py-16">
-      <motion.div
-        className="max-w-5xl mx-auto text-center mb-12"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <h1 className="text-4xl md:text-5xl font-serif tracking-wide uppercase mb-2 pt-16">
-          Shopping Cart
+    <div className="pt-28 min-h-screen bg-black text-white px-6">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-4xl font-bold mb-14 text-center tracking-wide">
+          <span>Your </span>
+          <span className="text-yellow-500">Cart</span>
         </h1>
-        <p className="text-yellow-500">
-          {cartItems.length} {cartItems.length === 1 ? "item" : "items"} in your cart
-        </p>
-      </motion.div>
 
-      {/* Cart Content */}
-      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-6">
-          {cartItems.map((item, index) => (
-            <motion.div
-              key={`${item._id}-${item.selectedSize}-${item.selectedColor}`}
-              className="flex gap-4 p-4 rounded-xl bg-black/70 border border-yellow-500/30 shadow-lg"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+        {products.length === 0 && (
+          <div className="text-center text-zinc-500 text-lg">
+            Your cart is empty 🛒
+          </div>
+        )}
+
+        <div className="space-y-6">
+          {products.map((item) => (
+            <div
+              key={`${item._id}-${item.size}-${item.color}`}
+              className="flex items-center justify-between bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6"
             >
-              <Link to={`/product/${item._id}`} className="shrink-0">
+              <div className="flex items-center gap-6">
                 <img
                   src={item.images[0]}
                   alt={item.name}
-                  className="w-20 h-28 md:w-24 md:h-32 object-cover rounded-lg"
+                  className="w-24 h-24 object-cover rounded-xl"
                 />
-              </Link>
 
-              <div className="flex-1 flex flex-col justify-between">
-                <div className="flex justify-between items-start mb-2">
-                  <Link to={`/product/${item._id}`}>
-                    <h3 className="font-medium hover:text-yellow-400 transition">{item.name}</h3>
-                  </Link>
+                <div>
+                  <h3 className="text-lg font-semibold">{item.name}</h3>
+                  <p className="text-sm text-zinc-400">
+                    Size: {item.size || "N/A"}
+                  </p>
+                  <p className="text-sm text-zinc-400">
+                    Color: {item.color || "N/A"}
+                  </p>
+                  <p className="text-yellow-500 font-bold mt-2">
+                    Rs. {item.price}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <div className="flex items-center border border-zinc-700 rounded-full px-3 py-1">
                   <button
-                    onClick={() => removeItem(item._id)}
-                    className="hover:text-red-600 transition"
+                    onClick={() =>
+                      dispatch(
+                        updateQuantity({
+                          id: item._id,
+                          size: item.size,
+                          color: item.color,
+                          type: "dec",
+                        })
+                      )
+                    }
                   >
-                    <Trash2 size={18} />
+                    <Minus size={18} />
+                  </button>
+
+                  <span className="px-3 text-yellow-500 font-semibold">
+                    {item.quantity}
+                  </span>
+
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        updateQuantity({
+                          id: item._id,
+                          size: item.size,
+                          color: item.color,
+                          type: "inc",
+                        })
+                      )
+                    }
+                  >
+                    <Plus size={18} />
                   </button>
                 </div>
 
-                <div>
-                  <p className="text-xs text-yellow-500">Size: {item.selectedSize}</p>
-                  <p className="text-xs text-yellow-500">Color: {item.selectedColor}</p>
-                </div>
-
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="flex items-center border border-yellow-500 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                      className="w-8 h-8 flex items-center justify-center hover:bg-yellow-500/20 transition"
-                    >
-                      <Minus size={14} />
-                    </button>
-                    <span className="w-10 text-center">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                      className="w-8 h-8 flex items-center justify-center hover:bg-yellow-500/20 transition"
-                    >
-                      <Plus size={14} />
-                    </button>
-                  </div>
-                  <span className="font-semibold">RS.{item.price * item.quantity}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Order Summary */}
-        <div>
-          <motion.div
-            className="bg-black/70 p-6 rounded-xl shadow-lg sticky top-24"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <h2 className="text-xl font-serif mb-4 text-white">Order Summary</h2>
-
-            <div className="mb-4">
-              <label className="block text-xs text-white mb-1">Promo Code</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value)}
-                  placeholder="Enter code"
-                  className="flex-1 px-3 py-2 rounded-lg bg-black/60 text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                />
                 <button
-                  onClick={applyPromo}
-                  className="px-3 py-2 bg-yellow-500 text-black rounded-lg hover:bg-yellow-400 transition font-semibold"
+                  onClick={() =>
+                    dispatch(
+                      removeFromCart({
+                        id: item._id,
+                        size: item.size,
+                        color: item.color,
+                      })
+                    )
+                  }
+                  className="text-red-500"
                 >
-                  Apply
+                  <Trash2 size={20} />
                 </button>
               </div>
             </div>
-
-            <div className="border-t border-yellow-500/30 pt-4 space-y-2">
-              <div className="flex justify-between text-sm text-white">
-                <span>Subtotal</span>
-                <span>RS.{subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-sm text-white">
-                <span>Shipping</span>
-                <span>{shipping === 0 ? "Free" : `RS.${shipping.toFixed(2)}`}</span>
-              </div>
-              {shipping > 0 && <p className="text-xs text-yellow-400">Free shipping on orders over RS.50000</p>}
-            </div>
-
-            <div className="border-t border-yellow-500/30 mt-4 pt-4 flex justify-between font-semibold text-lg text-white">
-              <span>Total</span>
-              <span>RS.{total.toFixed(2)}</span>
-            </div>
-
-            <button className="w-full mt-4 py-3 bg-yellow-500 text-black rounded-lg font-semibold hover:bg-yellow-400 transition flex items-center justify-center gap-2">
-              Proceed to Checkout <ArrowRight size={18} />
-            </button>
-          </motion.div>
+          ))}
         </div>
-      </div>
 
-      <div className="max-w-5xl mx-auto mt-12">
-        <Link
-          to="/shop"
-          className="inline-flex items-center gap-2 text-yellow-300 hover:text-yellow-500 transition"
-        >
-          ← Continue Shopping
-        </Link>
+        {products.length > 0 && (
+          <div className="mt-16 border-t border-zinc-800 pt-8 flex flex-col gap-8">
+            <div>
+              <p className="text-sm text-zinc-500 uppercase">
+                Total Amount
+              </p>
+              <p className="text-3xl font-bold text-yellow-500">
+                Rs. {totalPrice}
+              </p>
+            </div>
+
+            {/* PaySlip Upload */}
+            <div className="w-full max-w-md">
+              <h3 className="text-lg font-semibold text-yellow-400 mb-4 tracking-wide">
+                Payment Slip
+              </h3>
+
+              {!previewUrl ? (
+                <label className="group relative flex flex-col items-center justify-center 
+                  w-full h-56 rounded-2xl 
+                  border border-zinc-700 
+                  bg-gradient-to-br from-zinc-900 to-zinc-800
+                  hover:border-yellow-500/50
+                  hover:shadow-lg hover:shadow-yellow-500/10
+                  transition-all duration-300 cursor-pointer overflow-hidden">
+
+                  <i className="ri-upload-cloud-2-line text-5xl text-zinc-500 
+                    group-hover:text-yellow-400 transition duration-300"></i>
+
+                  <p className="mt-4 text-zinc-400 group-hover:text-yellow-400 transition">
+                    Click to upload payment slip
+                  </p>
+
+                  <p className="text-xs text-zinc-600 mt-2">
+                    JPG, PNG (Max 5MB)
+                  </p>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                </label>
+              ) : (
+                <div className="relative group w-full h-56 rounded-2xl overflow-hidden border border-zinc-700">
+                  <img
+                    src={previewUrl}
+                    alt="Pay Slip"
+                    className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+
+                  <div className="absolute inset-0 bg-black/60 opacity-0 
+                    group-hover:opacity-100 transition duration-300 
+                    flex items-center justify-center gap-6">
+
+                    <label className="cursor-pointer text-white hover:text-yellow-400 transition">
+                      <i className="ri-refresh-line text-2xl"></i>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <button
+                      onClick={removeImage}
+                      className="text-white hover:text-red-500 transition"
+                    >
+                      <i className="ri-delete-bin-6-line text-2xl"></i>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={handlePlaceOrder}
+              disabled={isLoading}
+              className="px-10 py-3 rounded-full font-semibold bg-yellow-500 text-black hover:bg-yellow-400 transition"
+            >
+              {isLoading ? "Placing Order..." : "Place Order"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
