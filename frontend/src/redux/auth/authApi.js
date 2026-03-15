@@ -52,6 +52,16 @@ const authAPI = createApi({
         }),
         invalidatesTags: ["Auth"],
       }),
+
+      getUserById: builder.query({
+        query: (id) => `/${id}`,
+        providesTags: ["Auth"],
+      }),
+        verifyToken: builder.query({
+        query: () => "/verify-token",
+        providesTags: ["Auth"],
+      }),
+
   }),
 });
 
@@ -62,6 +72,9 @@ export const {
   useGetAllUsersQuery,
   useUpdateUserProfileMutation,
   useDeleteUserMutation,
+  useGetUserByIdQuery,
+  useVerifyTokenQuery
+
 } = authAPI;
 
 export default authAPI;
