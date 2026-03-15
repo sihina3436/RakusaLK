@@ -10,7 +10,7 @@ export const productApi = createApi({
   tagTypes: ["Product"],
   endpoints: (builder) => ({
 
-    // 🔥 1️⃣ Upload Multiple Images
+    //  1️⃣ Upload Multiple Images
     uploadImages: builder.mutation({
       query: (formData) => ({
         url: "/upload/uploadMultipleImages",
@@ -19,7 +19,7 @@ export const productApi = createApi({
       }),
     }),
 
-    // 🔥 2️⃣ Create Product
+    //  2️⃣ Create Product
     createProduct: builder.mutation({
       query: (productData) => ({
         url: "/products",
@@ -29,28 +29,28 @@ export const productApi = createApi({
       invalidatesTags: ["Product"],
     }),
 
-    // 🔥 3️⃣ Get All Products
+    //  3️⃣ Get All Products
     getAllProducts: builder.query({
       query: () => "/products",
       providesTags: ["Product"],
     }),
 
-    // 🔥 4️⃣ Get Product By ID
+    //  4️⃣ Get Product By ID
     getProductById: builder.query({
       query: (id) => `/products/${id}`,
     }),
 
-    // 🔥 5️⃣ Get Products By Category
+    //  5️⃣ Get Products By Category
     getProductbyCategory: builder.query({
       query: (categoryId) => `/products/category/${categoryId}`,
     }),
 
-    // 🔥 6️⃣ Get Products By SubCategory
+    //  6️⃣ Get Products By SubCategory
     getProductbySubCategory: builder.query({
       query: (subCategoryId) => `/products/subcategory/${subCategoryId}`,
     }),
 
-    // 🔥 7️⃣ Update Product
+    //  7️⃣ Update Product
     updateProduct: builder.mutation({
       query: ({ id, updatedData }) => ({
         url: `/products/${id}`,
@@ -60,7 +60,7 @@ export const productApi = createApi({
       invalidatesTags: ["Product"],
     }),
 
-    // 🔥 8️⃣ Delete Product
+    //  8️⃣ Delete Product
     deleteProduct: builder.mutation({
       query: (id) => ({
         url: `/products/${id}`,
