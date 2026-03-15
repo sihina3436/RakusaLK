@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { Menu, X, Search, User, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import rakuza from "../assets/rakuza.jpeg";
+import { useSelector } from "react-redux";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -13,6 +14,7 @@ const navigation = [
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useSelector((state) => state.auth);
 
   return (
     <header
@@ -77,7 +79,7 @@ const Navbar = () => {
 
             {/* Account */}
             <NavLink
-              to="/login"
+              to={user?.role === "user" ? "/dashboard/user" : "/dashboard"}
               className={({ isActive }) =>
                 `flex items-center justify-center p-2 rounded-full
                 transition-all duration-300
@@ -166,3 +168,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
