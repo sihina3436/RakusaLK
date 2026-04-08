@@ -10,7 +10,9 @@ const {
   getAllUsers,
   updateUserProfile,
   getUserById,
-  verifyToken
+  verifyToken,
+  forgotPassword,
+  resetPassword
 } = require("../controller/user.controller");
 
 
@@ -21,6 +23,9 @@ router.get("/", getAllUsers); // ☑️
 router.delete("/:id", deleteUser); // ☑️
 router.put("/profile", updateUserProfile); // ☑️
 router.get("/verify-token",authMiddleware,  verifyToken);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 router.get("/:id", getUserById); 
+
 
 module.exports = router;
