@@ -4,38 +4,46 @@ import { getBaseURL } from "../../utils/baseURL";
 export const orderApi = createApi({
   reducerPath: "orderApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${getBaseURL()}/api/orders`,
+    baseUrl: `${getBaseURL()}/api`,
     credentials: "include",
   }),
   tagTypes: ["Order"],
   endpoints: (builder) => ({
     placeOrder: builder.mutation({
       query: (orderData) => ({
-        url: "/order/place",
+        url: "/orders/place",
         method: "POST",
         body: orderData,
       }),
       invalidatesTags: ["Order"],
     }),
 
+    uplpadPaySlip: builder.mutation({
+      query: (formData) => ({
+        url: "/upload/uploadPaySlip",
+        method: "POST",
+        body: formData,
+      }),
+    }),
+
     getAllSellerOrders: builder.query({
-      query: () => "/order/getAllOrder",
+      query: () => "/orders/getAllOrder",
       providesTags: ["Order"],
     }),
 
     getUserOrders: builder.query({
-      query: () => "/order/getUserOrders",
+      query: () => "/orders/getUserOrders",
       providesTags: ["Order"],
     }),
 
     getOrderById: builder.query({
-      query: (id) => `/order/${id}`,
+      query: (id) => `/orders/orders/${id}`,
       providesTags: ["Order"],
     }),
 
     updateOrderStatus: builder.mutation({
       query: ({ id, status }) => ({
-        url: `/order/${id}/status`,
+        url: `/orders/${id}/status`,
         method: "PUT",
         body: { status },
       }),
@@ -44,7 +52,7 @@ export const orderApi = createApi({
 
     deleteOrder: builder.mutation({
       query: (id) => ({
-        url: `/order/${id}`,
+        url: `/orders/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Order"],
@@ -59,4 +67,5 @@ export const {
   useGetOrderByIdQuery,
   useUpdateOrderStatusMutation,
   useDeleteOrderMutation,
+  useUplpadPaySlipMutation
 } = orderApi;

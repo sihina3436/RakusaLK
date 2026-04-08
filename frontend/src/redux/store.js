@@ -8,10 +8,13 @@ import  {colorApi}  from "./color/colorApi";
 import  {productApi}  from "./products/productApi";
 import  {categoryApi } from "./category/categoryAPI";
 import  {orderApi } from "./order/orderApi";
+import  {reviewApi } from "./review/reviewAPI";
+import cartReducer from "./cart/cartSlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    cart: cartReducer,
 
     [authAPI.reducerPath]: authAPI.reducer,
     [StatsApi.reducerPath]: StatsApi.reducer,
@@ -20,6 +23,7 @@ export const store = configureStore({
     [productApi.reducerPath]: productApi.reducer,
     [categoryApi.reducerPath]: categoryApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
+    [reviewApi.reducerPath]: reviewApi.reducer
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -30,6 +34,7 @@ export const store = configureStore({
       colorApi.middleware,
       productApi.middleware,
       categoryApi.middleware,
-      orderApi.middleware
+      orderApi.middleware,
+      reviewApi.middleware
     ),
 });

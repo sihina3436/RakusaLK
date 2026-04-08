@@ -32,6 +32,14 @@ const userSchema = new Schema(
       postalCode: String,
       country: String,
     },
+
+    resetOTP: String,
+    resetOTPExpires: Date,
+
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
   },
   { timestamps: true }
 );

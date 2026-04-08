@@ -28,4 +28,17 @@ const getAllSizes = async (req, res) => {
     }   
 };
 
-module.exports = { createSize, getAllSizes };
+const getSizeById = async (req, res) => {
+    try {
+        const size = await Size.findById(req.params.id);
+        if (!size) {
+            return res.status(404).json({ message: "Size not found" });
+        }
+        res.status(200).json(size);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+
+module.exports = { createSize, getAllSizes, getSizeById };

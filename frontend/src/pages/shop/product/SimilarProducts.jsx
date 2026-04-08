@@ -1,102 +1,39 @@
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { products } from "../../../components/products.js";
-import ProductCard from "../ProductCard.jsx";
+import { useGetAllProductsQuery } from "../../../redux/products/productApi";
+import ProductCard from "../ProductCard";
 
-const SimilarProducts = ({ currentProductId, category }) => {
+const SimilarProducts = ({ currentProductId, categoryId }) => {
+  const { data: products = [], isLoading } = useGetAllProductsQuery();
+
+  if (isLoading) return null;
 
   const similarProducts = products
-    .filter(
-      (p) =>
+    .filter((p) => {
+      const productCategoryId =
+        typeof p.category === "object"
+          ? p.category._id
+          : p.category;
+
+      return (
         p._id !== currentProductId &&
-        p.category &&
-        category &&
-        p.category._id === category._id
-    )
+        productCategoryId === categoryId
+      );
+    })
     .slice(0, 4);
 
-  if (similarProducts.length === 0) {
-    const otherProducts = products
-      .filter((p) => p._id !== currentProductId)
-      .slice(0, 4);
-
-    return (
-      <section className="section-padding bg-cream">
-        <div>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex items-end justify-between mb-12"
-          >
-            <div>
-              <h2 className="font-serif text-2xl md:text-3xl mb-2 text-white">
-                You May Also Like
-              </h2>
-              <p className="text-muted-foreground text-white">
-                Explore more from our collection
-              </p>
-            </div>
-
-            <Link
-              to="/shop"
-              className="text-sm uppercase tracking-[0.2em] underline-animation hidden md:block"
-            >
-              View All
-            </Link>
-          </motion.div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {otherProducts.map((product, index) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                index={index}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (!similarProducts.length) return null;
 
   return (
-    <section className="section-padding bg-cream">
-      <div className="container-luxury">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex items-end justify-between mb-12"
-        >
-          <div>
-            <h2 className="font-serif text-2xl md:text-3xl mb-2">
-              Similar Products
-            </h2>
-            <p className="text-muted-foreground">
-              More from {category?.name}
-            </p>
-          </div>
+    <div>
+      <h2 className="text-2xl text-yellow-400 mb-6">
+        Similar Products
+      </h2>
 
-          <Link
-            to={`/shop?category=${category?._id}`}
-            className="text-sm uppercase tracking-[0.2em] underline-animation hidden md:block"
-          >
-            View All
-          </Link>
-        </motion.div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {similarProducts.map((product, index) => (
-            <ProductCard
-              key={product._id}
-              product={product}
-              index={index}
-            />
-          ))}
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {similarProducts.map((p, i) => (
+          <ProductCard key={p._id} product={p} index={i} />
+        ))}
       </div>
-    </section>
+    </div>
   );
 };
 

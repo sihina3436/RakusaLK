@@ -29,15 +29,23 @@ const AddCategoryAndSubcategory = () => {
     setCategoryName("");
   };
 
-  const handleCreateSubcategory = async (e) => {
-    e.preventDefault();
-    if (!subcategoryName || !selectedCategory) return;
+const handleCreateSubcategory = async (e) => {
+  e.preventDefault();
+
+  if (!subcategoryName || !selectedCategory) return;
+
+  try {
     await createSubcategory({
       name: subcategoryName,
-      categoryId: selectedCategory,
-    });
+      category: selectedCategory,
+    }).unwrap();
+
     setSubcategoryName("");
-  };
+  } catch (err) {
+    console.error("Subcategory create error:", err);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white p-6">

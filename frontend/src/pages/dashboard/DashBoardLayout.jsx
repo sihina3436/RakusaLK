@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 import AdminDashboardMain from "./admin/dashboard/AdminDashboardMain";
-import UserDashboard from "./UserDashboard";
+import UserDashboardMain from "./user/dashboard/UserDashboardMain";
 
 const DashBoardLayout = () => {
   const { user } = useSelector((state) => state.auth);
@@ -10,7 +10,7 @@ const DashBoardLayout = () => {
 
   const Sidebar = () => {
     if (user.role === "seller") return <AdminDashboardMain />;
-    if (user.role === "user") return <UserDashboard />;
+    if (user.role === "user") return <UserDashboardMain />;
     return <Navigate to="/" />;
   };
 

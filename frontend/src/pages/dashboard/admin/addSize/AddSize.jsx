@@ -29,75 +29,56 @@ const AddSize = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <div className="max-w-3xl mx-auto space-y-8">
-        {/* Title */}
-        <h1 className="text-3xl font-bold text-yellow-400 tracking-wide">
-          Manage Sizes
-        </h1>
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-6 text-zinc-100">
+        Manage Sizes
+      </h1>
 
-        {/* Create Size */}
+      {/* ADD SIZE */}
+      <div className="mb-8 rounded-xl bg-zinc-900/70 backdrop-blur border border-zinc-800 p-4 shadow-md">
         <form
           onSubmit={handleSubmit}
-          className="bg-zinc-900 border border-yellow-500/30 rounded-2xl p-6 space-y-4"
+          className="flex flex-col sm:flex-row gap-3 items-center"
         >
-          <h2 className="text-xl font-semibold text-yellow-400">
-            Create New Size
-          </h2>
-
           <input
             type="text"
-            placeholder="Enter size (ex: S, M, L, XL)"
+            placeholder="Size name (S, M, L, XL)"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-black border border-yellow-500/40 
-                       focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            className="flex-1 rounded-lg px-3 py-2 bg-zinc-800 border border-zinc-700 text-zinc-200 focus:ring-2 focus:ring-amber-400 outline-none"
           />
 
           <button
             type="submit"
             disabled={creating}
-            className="w-full py-3 rounded-xl font-semibold
-                       bg-yellow-500 text-black hover:bg-yellow-400
-                       transition disabled:opacity-50"
+            className="rounded-lg bg-amber-400 px-4 py-2 font-semibold text-zinc-900 hover:bg-amber-500 transition-all active:scale-95"
           >
-            {creating ? "Creating..." : "Add Size"}
+            {creating ? "Saving..." : "Add"}
           </button>
         </form>
-
-        {/* Size List */}
-        <div className="bg-zinc-900 border border-yellow-500/30 rounded-2xl p-6">
-          <h2 className="text-xl font-semibold text-yellow-400 mb-4">
-            Available Sizes
-          </h2>
-
-          {isLoading && (
-            <p className="text-gray-400">Loading sizes...</p>
-          )}
-
-          {isError && (
-            <p className="text-red-500">Failed to load sizes</p>
-          )}
-
-          {!isLoading && sizes.length === 0 && (
-            <p className="text-gray-400">No sizes available</p>
-          )}
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {sizes.map((size) => (
-              <div
-                key={size._id}
-                className="flex items-center justify-center
-                           border border-yellow-500/40
-                           rounded-xl py-3 font-semibold
-                           text-yellow-400 bg-black"
-              >
-                {size.name}
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
+
+      {/* SIZES GRID */}
+      {isLoading ? (
+        <p className="text-zinc-400">Loading sizes...</p>
+      ) : isError ? (
+        <p className="text-red-500">Failed to load sizes</p>
+      ) : sizes.length === 0 ? (
+        <p className="text-zinc-400">No sizes yet</p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {sizes.map((size) => (
+            <div
+              key={size._id}
+              className="group flex items-center justify-center p-3 rounded-lg bg-zinc-800 border border-zinc-700 shadow-sm hover:shadow-md transition-all"
+            >
+              <span className="text-sm font-semibold text-zinc-100">
+                {size.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
