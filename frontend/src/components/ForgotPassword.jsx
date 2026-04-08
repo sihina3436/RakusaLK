@@ -3,6 +3,12 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Mail, CheckCircle } from "lucide-react";
 
+
+import {
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+} from "../redux/auth/authApi";
+
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -13,6 +19,10 @@ const ForgotPassword = () => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
+ 
+  const [forgotPassword] = useForgotPasswordMutation();
+  const [resetPassword] = useResetPasswordMutation();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -20,65 +30,43 @@ const ForgotPassword = () => {
     try {
       setLoading(true);
 
-      //SEND OTP
+      
       if (step === 1) {
         if (!email) {
           setError("Email address is required");
           return;
         }
 
-        // const response = await fetch(
-        //   "http://localhost:5000/api/users/forgot-password",
-        //   {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ email }),
-        //   }
-        // );
-
-        // const data = await response.json();
-
-        // if (!response.ok) {
-        //   throw new Error(data.message);
-        // }
+        const res = await forgotPassword(email).unwrap();
+        console.log("OTP SENT:", res);
 
         setStep(2);
       }
 
-      // VALIDATE OTP & RESET PASSWORD
+      
       else if (step === 2) {
         if (!otp || !newPassword) {
           setError("All fields are required");
           return;
         }
 
-        // const response = await fetch(
-        //   "http://localhost:5000/api/users/reset-password",
-        //   {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ email, otp, newPassword }),
-        //   }
-        // );
+        const res = await resetPassword({
+          email,
+          otp,
+          newPassword,
+        }).unwrap();
 
-        // const data = await response.json();
+        console.log("RESET SUCCESS:", res);
 
-        // if (!response.ok) {
-        //   // OTP invalid or expired → do NOT reset
-        //   setError(data.message);
-        //   return;
-        // }
-
-        // Only reaches here if OTP is valid
         setSubmitted(true);
       }
     } catch (err) {
-      setError(err.message || "Something went wrong");
+      console.error(err);
+      setError(err?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
-};
-
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black px-4">

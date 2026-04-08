@@ -7,7 +7,7 @@ const PromoSection = () => {
       
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&q=80"
+          src="https://shorturl.at/xYvxA"
           alt="Promo"
           className="w-full h-full object-cover scale-105"
         />

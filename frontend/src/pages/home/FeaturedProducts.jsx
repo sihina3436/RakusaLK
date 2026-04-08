@@ -1,146 +1,119 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
-import { products } from "../../components/products.js";
+import { useGetAllProductsQuery } from "../../redux/products/productApi";
 
 const FeaturedProducts = () => {
+
+  const { data: products = [], isLoading } = useGetAllProductsQuery();
+
+ 
   const featuredProducts = products.slice(0, 4);
+
+  if (isLoading) {
+    return (
+      <div className="text-center text-yellow-500 py-20">
+        Loading products...
+      </div>
+    );
+  }
 
   return (
     <section className="py-18 bg-linear-to-br from-black via-neutral-900 to-black relative overflow-hidden">
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
 
+        {/* HEADER */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <h2 className="font-serif text-4xl sm:text-5xl text-white mb-4 tracking-wide">
+          <h2 className="font-serif text-4xl text-white mb-4">
             Featured Collection
           </h2>
-          <p className="text-gray-400 max-w-xl mx-auto text-sm sm:text-base">
-            Handpicked pieces defined by craftsmanship, elegance, and premium quality.
+
+          <p className="text-gray-400 max-w-xl mx-auto">
+            Handpicked premium products.
           </p>
+
           <Link
             to="/shop"
-            className="
-              inline-block mt-6
-              text-xs uppercase tracking-[0.3em]
-              text-yellow-500
-              border-b border-yellow-500/40
-              hover:border-yellow-500
-              hover:text-yellow-400
-              transition
-            "
+            className="mt-6 inline-block text-yellow-500 border-b border-yellow-500/40 hover:text-yellow-400"
           >
             View All
           </Link>
         </motion.div>
 
-        {/* Products Grid */}
+        {/* PRODUCTS GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-          {featuredProducts.map((product, index) => (
-            <motion.div
-              key={product._id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.12 }}
-              whileHover={{ y: -8 }}
-              className="
-                group
-                bg-white/5
-                backdrop-blur-xl
-                border border-yellow-500/15
-                rounded-2xl
-                overflow-hidden
-                shadow-[0_25px_50px_rgba(0,0,0,0.5)]
-                transition-all
-              "
-            >
-              <Link to={`/product/${product.id}`} className="block">
+          {featuredProducts.map((product, index) => {
 
-                <div className="relative aspect-4/5 overflow-hidden">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition duration-500" />
+            const image = product.images?.[0] || "";
+            const categoryName =
+              typeof product.category === "object"
+                ? product.category?.name
+                : product.category;
 
-                  {product.isNew && (
-                    <span className="absolute top-4 left-4 bg-linear-to-r from-yellow-400 to-yellow-600 text-black text-[10px] px-3 py-1 uppercase rounded-full tracking-wide">
-                      New
-                    </span>
-                  )}
-                  {product.isSale && (
-                    <span className="absolute top-4 left-4 bg-red-600 text-white text-[10px] px-3 py-1 uppercase rounded-full tracking-wide">
-                      Sale
-                    </span>
-                  )}
+            return (
+              <motion.div
+                key={product._id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="group bg-white/5 border border-yellow-500/15 rounded-2xl overflow-hidden"
+              >
+                {/* ✅ FIXED ID */}
+                <Link to={`/product/${product._id}`}>
 
-                  <button
-                    className="
-                      absolute top-4 right-4
-                      w-9 h-9
-                      bg-black/60 backdrop-blur
-                      border border-yellow-500/30
-                      flex items-center justify-center
-                      rounded-full
-                      opacity-0 group-hover:opacity-100
-                      transition
-                    "
-                    aria-label="Add to wishlist"
-                  >
-                    <Heart size={14} className="text-yellow-500" />
-                  </button>
+                  {/* IMAGE */}
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    <img
+                      src={image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition"
+                    />
 
-                  <div className="absolute inset-x-4 bottom-4 translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-500">
-                    <button className="
-                      w-full
-                      bg-linear-to-r from-yellow-400 to-yellow-600
-                      text-black
-                      py-2
-                      text-xs
-                      uppercase
-                      tracking-wider
-                      rounded-full
-                      hover:brightness-110
-                    ">
-                      Quick View
-                    </button>
-                  </div>
-                </div>
-
-                {/* Product Info */}
-                <div className="p-6 text-center">
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
-                    {product.category}
-                  </p>
-
-                  <h3 className="font-serif text-base text-white mb-3">
-                    {product.name}
-                  </h3>
-
-                  <div className="flex items-center justify-center gap-3">
-                    <span className="text-yellow-500 font-medium text-sm">
-                      Rs. {product.price}
-                    </span>
-
-                    {product.originalPrice && (
-                      <span className="text-gray-500 line-through text-xs">
-                        Rs. {product.originalPrice}
+                    {/* BADGES */}
+                    {product.isNew && (
+                      <span className="absolute top-4 left-4 bg-yellow-500 text-black text-xs px-2 py-1 rounded">
+                        NEW
                       </span>
                     )}
+
+                    {product.isSale && (
+                      <span className="absolute top-4 left-4 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                        SALE
+                      </span>
+                    )}
+
+                    {/* WISHLIST */}
+                    <button className="absolute top-4 right-4 w-9 h-9 bg-black/60 rounded-full flex items-center justify-center">
+                      <Heart size={14} className="text-yellow-500" />
+                    </button>
                   </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+
+                  {/* INFO */}
+                  <div className="p-6 text-center">
+                    <p className="text-xs text-gray-400 uppercase">
+                      {categoryName}
+                    </p>
+
+                    <h3 className="text-white text-base mt-2">
+                      {product.name}
+                    </h3>
+
+                    <p className="text-yellow-500 font-bold mt-2">
+                      Rs. {product.price}
+                    </p>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
+
       </div>
     </section>
   );
