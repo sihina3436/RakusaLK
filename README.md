@@ -1,11 +1,11 @@
-# 😈 RakusaLK
+# RakusaLK
 
 RakusaLK is a modern **React + Vite** frontend web application built with **Redux Toolkit**, **React Router**, and **Tailwind CSS**.  
 It’s designed with modular architecture and clean code practices for scalability, performance, and ease of development.
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
 | Technology | Purpose |
 |-------------|----------|
@@ -18,7 +18,7 @@ It’s designed with modular architecture and clean code practices for scalabili
 
 ---
 
-## 🛠️ Project Setup
+## Project Setup
 
 ### 1️⃣ Clone the Repository
 ```bash
@@ -37,7 +37,7 @@ npm run dev
 ```
 ---
 
-## 🧩 Folder Structure
+## Folder Structure
 
 ```
 RakusaLK/
@@ -66,19 +66,19 @@ RakusaLK/
 
 ---
 
-## 🧠 Key Features
+## Key Features
 
-- ⚡ Fast performance powered by **Vite**
-- 🧱 Modular file structure for scalability
-- 🗺️ Client-side routing using **React Router**
-- 🧩 Global state management with **Redux Toolkit**
-- 🎨 Responsive design with **Tailwind CSS**
-- 🔄 Live reload with **Nodemon** during backend development (if used)
-- 🖼️ Beautiful iconography via **Remixicon** and **React Icons**
+- Fast performance powered by **Vite**
+- Modular file structure for scalability
+- Client-side routing using **React Router**
+- Global state management with **Redux Toolkit**
+- Responsive design with **Tailwind CSS**
+- Live reload with **Nodemon** during backend development (if used)
+- Beautiful iconography via **Remixicon** and **React Icons**
 
 ---
 
-## 🧰 Available Scripts
+##  Available Scripts
 
 | Command | Description |
 |----------|--------------|
