@@ -77,22 +77,54 @@ const Navbar = () => {
               <Search size={20} />
             </NavLink>
 
-            {/* Account */}
-            <NavLink
-              to={user?.role === "user" ? "/dashboard/user" : "/dashboard"}
-              className={({ isActive }) =>
-                `flex items-center justify-center p-2 rounded-full
-                transition-all duration-300
-                ${
-                  isActive
-                    ? "text-yellow-400 bg-white/10"
-                    : "text-gray-300 hover:text-yellow-400 hover:bg-white/10"
-                }`
-              }
-              aria-label="Account"
-            >
-              <User size={20} />
-            </NavLink>
+            {/* Account or Auth Buttons */}
+            {user ? (
+              <NavLink
+                to={user?.role === "user" ? "/dashboard/user" : "/dashboard/admin"}
+                className={({ isActive }) =>
+                  `flex items-center justify-center p-2 rounded-full
+                  transition-all duration-300
+                  ${
+                    isActive
+                      ? "text-yellow-400 bg-white/10"
+                      : "text-gray-300 hover:text-yellow-400 hover:bg-white/10"
+                  }`
+                }
+                aria-label="Account"
+              >
+                <User size={20} />
+              </NavLink>
+            ) : (
+              <>
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    `hidden md:inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold tracking-wide transition
+                    ${
+                      isActive
+                        ? "text-black bg-yellow-400"
+                        : "text-yellow-400 border border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                    }`
+                  }
+                >
+                  Sign In
+                </NavLink>
+
+                <NavLink
+                  to="/signup"
+                  className={({ isActive }) =>
+                    `hidden md:inline-flex items-center px-3 py-1.5 rounded-md text-sm font-semibold tracking-wide transition
+                    ${
+                      isActive
+                        ? "text-black bg-yellow-400"
+                        : "text-yellow-400 border border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                    }`
+                  }
+                >
+                  Sign Up
+                </NavLink>
+              </>
+            )}
 
             {/* Cart */}
             <NavLink
@@ -159,6 +191,32 @@ const Navbar = () => {
                   {item.name}
                 </NavLink>
               ))}
+
+              {!user && (
+                <>
+                  <NavLink
+                    to="/login"
+                    className={({ isActive }) =>
+                      `block text-lg tracking-widest uppercase py-2 transition
+                       ${isActive ? "text-yellow-400 font-semibold" : "text-gray-300 hover:text-yellow-400"}`
+                    }
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                  </NavLink>
+
+                  <NavLink
+                    to="/signup"
+                    className={({ isActive }) =>
+                      `block text-lg tracking-widest uppercase py-2 transition
+                       ${isActive ? "text-yellow-400 font-semibold" : "text-gray-300 hover:text-yellow-400"}`
+                    }
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign Up
+                  </NavLink>
+                </>
+              )}
             </div>
           </motion.div>
         )}
