@@ -36,7 +36,7 @@ const AdminDashboardMain = () => {
   };
 
   return (
-    <aside className="h-screen bg-black text-white border border-yellow-500 rounded-4xl flex flex-col p-5">
+    <div className="h-full bg-black text-white border border-yellow-500 rounded-4xl flex flex-col p-5">
       {/* LOGO */}
       <Link to="/" className="text-2xl font-bold text-yellow-400 text-center mb-6">
         Rakusa<span className="text-white">.</span>
@@ -71,7 +71,7 @@ const AdminDashboardMain = () => {
         <FaSignOutAlt />
         Logout
       </button>
-    </aside>
+    </div>
   );
 };
 

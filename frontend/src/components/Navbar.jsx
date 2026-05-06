@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, X, Search, User, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import rakuza from "../assets/Rakuza.jpeg";
+import rakuza from "../assets/Rakuza.png";
 import { useSelector } from "react-redux";
 
 const navigation = [
