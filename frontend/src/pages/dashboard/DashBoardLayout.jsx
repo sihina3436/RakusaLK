@@ -27,7 +27,7 @@ const DashBoardLayout = () => {
     <div className="h-screen flex bg-[#0a0a0a] overflow-hidden">
       
       {/* SIDEBAR */}
-      <aside className="w-72 flex-shrink-0 p-3 overflow-y-auto">
+      <aside className="w-72 shrink-0 p-3 overflow-y-auto">
         {renderSidebar()}
       </aside>
 
