@@ -32,44 +32,50 @@ const UserDashboardMain = () => {
   };
 
   return (
-    <div className="h-full bg-black text-white border border-yellow-500 rounded-4xl flex flex-col p-5">
-      <Link
-        to="/"
-        className="text-2xl font-bold text-yellow-400 text-center mb-6"
-      >
-        Rakusa<span className="text-white">.</span>
-      </Link>
+    <div className="h-screen flex bg-black overflow-hidden">
+      <aside className="w-64 h-full bg-black text-white border border-yellow-500 rounded-4xl flex flex-col p-5">
+        <Link
+          to="/"
+          className="text-2xl font-bold text-yellow-400 text-center mb-6"
+        >
+          Rakusa<span className="text-white">.</span>
+        </Link>
 
-      <nav className="flex-1 space-y-2 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition ${
-                  isActive
-                    ? "bg-yellow-400 text-black font-semibold"
-                    : "text-gray-300 hover:bg-yellow-400/10 hover:text-yellow-400"
-                }`
-              }
-            >
-              <Icon className="text-lg" />
-              {item.label}
-            </NavLink>
-          );
-        })}
-      </nav>
+        <nav className="flex-1 space-y-2 overflow-y-auto">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition ${
+                    isActive
+                      ? "bg-yellow-400 text-black font-semibold"
+                      : "text-gray-300 hover:bg-yellow-400/10 hover:text-yellow-400"
+                  }`
+                }
+              >
+                <Icon className="text-lg" />
+                {item.label}
+              </NavLink>
+            );
+          })}
+        </nav>
 
-      <button
-        onClick={handleLogout}
-        disabled={isLoading}
-        className="mt-4 flex items-center justify-center gap-2 bg-yellow-400 text-black py-2 rounded-lg font-semibold hover:bg-yellow-300 disabled:opacity-50"
-      >
-        <FaSignOutAlt />
-        {isLoading ? "Logging out..." : "Logout"}
-      </button>
+        <button
+          onClick={handleLogout}
+          disabled={isLoading}
+          className="mt-4 flex items-center justify-center gap-2 bg-yellow-400 text-black py-2 rounded-lg font-semibold hover:bg-yellow-300 disabled:opacity-50"
+        >
+          <FaSignOutAlt />
+          {isLoading ? "Logging out..." : "Logout"}
+        </button>
+      </aside>
+
+      <main className="flex-1 overflow-y-auto p-6">
+        <Outlet />
+      </main>
     </div>
   );
 };
