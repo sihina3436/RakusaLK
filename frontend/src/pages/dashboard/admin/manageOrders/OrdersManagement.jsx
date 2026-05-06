@@ -80,7 +80,7 @@ const OrdersManagement = () => {
                 </td>
 
                 <td className="px-6 py-4 font-semibold text-amber-400">
-                  ${order.totalAmount.toFixed(2)}
+                  LKR {order.totalAmount.toFixed(2)}
                 </td>
 
                 <td className="px-6 py-4">
